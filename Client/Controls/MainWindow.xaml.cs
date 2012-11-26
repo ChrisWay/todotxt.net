@@ -25,10 +25,7 @@ namespace Client
 	{
 		TrayMainWindows _tray;
 		HotKeyMainWindows _hotkey;
-		UpdateChecker _updateChecker;
-
 		WindowLocation _previousWindowLocaiton;
-
 
 		public MainWindow()
 		{
@@ -50,8 +47,6 @@ namespace Client
 
 			SetWindowPosition();
 
-			
-
 			lbTasks.Focus();
 		}
 
@@ -59,9 +54,8 @@ namespace Client
 
 		private void CheckForUpdates()
 		{
-			_updateChecker = new UpdateChecker();
-			_updateChecker.OnCheckedUpdateVersion += (v) => ToggleUpdateMenu(v);
-			_updateChecker.Check();
+			var updateChecker = new UpdateChecker(this);
+			updateChecker.Check();
 		}
 
 		private void SetupTrayIcon()
@@ -146,7 +140,7 @@ namespace Client
 			ViewModel.ShowFilterDialog();
 		}
 
-		private void ToggleUpdateMenu(string version)
+		public void ToggleUpdateMenu(string version)
 		{
 			var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 			if (version != assemblyVersion)
@@ -154,6 +148,12 @@ namespace Client
 				UpdateMenu.Header = "New version: " + version;
 				UpdateMenu.Visibility = Visibility.Visible;
 			}
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+			ViewModel = new MainWindowViewModel(this);
+			DataContext = ViewModel;
 		}
 
 		#region window location handlers
@@ -390,13 +390,6 @@ namespace Client
 			ViewModel.IntellisenseMouseUp();
 		}
 		#endregion
-
-		private void Window_Loaded(object sender, RoutedEventArgs e)
-		{
-			ViewModel = new MainWindowViewModel(this);
-			DataContext = ViewModel;
-		}
-
 	}
 }
 
